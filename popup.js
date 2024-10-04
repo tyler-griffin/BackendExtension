@@ -1,6 +1,6 @@
 
 const getProfileSlug = () => {
-    return document.body.getAttribute('data-profile-slug');
+    return document.querySelector("meta[name='cybernautic-editor-backend-uri']").getAttribute('content');
 }
 
 document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventListener("click", () => {
@@ -14,13 +14,13 @@ document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventL
         currentUrl = currentUrl.replace("https://", "");
         currentUrl = currentUrl.replace("http://", "");
         currentUrl = currentUrl.replace(/\/+$/, "");
- 
+
         let urlParts = currentUrl.split('/');
- 
+
         let domain = urlParts[0];
- 
+
         urlParts.shift();
- 
+
         var path = urlParts.join("/");
 
         chrome.scripting.executeScript({
@@ -33,7 +33,7 @@ document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventL
             }
 
             let modifiedUrl = "https://" + domain + "/backend";
- 
+
             if(path != "") { modifiedUrl += "#/editor/" + path; }
 
             if(button.id == 'updateCurrentTab') {
@@ -51,3 +51,5 @@ document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventL
     });
 
 }));
+
+
