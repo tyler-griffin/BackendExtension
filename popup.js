@@ -1,8 +1,16 @@
-document.getElementById('updateCurrentTab').addEventListener('click', function() {
+
+const getProfileSlug = () => {
+    return document.body.getAttribute('data-profile-slug');
+}
+
+document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventListener("click", () => {
+    
+    var button = elem;
+
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
- 
+
         let currentUrl = tabs[0].url;
- 
+
         currentUrl = currentUrl.replace("https://", "");
         currentUrl = currentUrl.replace("http://", "");
         currentUrl = currentUrl.replace(/\/+$/, "");
@@ -13,39 +21,33 @@ document.getElementById('updateCurrentTab').addEventListener('click', function()
  
         urlParts.shift();
  
-        let path = urlParts.join("/");
- 
-        let modifiedUrl = "https://" + domain + "/backend";
- 
-        if(path != "") { modifiedUrl += "#/editor/" + path; }
+        var path = urlParts.join("/");
 
-        chrome.tabs.update(tabs[0].id, {url: modifiedUrl});
+        chrome.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            func: getProfileSlug
+        }, (result) => {
+
+            if(result[0].result != null) {
+                path = result[0].result;
+            }
+
+            let modifiedUrl = "https://" + domain + "/backend";
+ 
+            if(path != "") { modifiedUrl += "#/editor/" + path; }
+
+            if(button.id == 'updateCurrentTab') {
+
+                chrome.tabs.update(tabs[0].id, {url: modifiedUrl});
+
+            } else if(button.id == 'openNewTab') {
+
+                chrome.tabs.create({url: modifiedUrl});
+
+            }
+
+        });
         
     });
-});
 
-document.getElementById('openNewTab').addEventListener('click', function() {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
- 
-        let currentUrl = tabs[0].url;
- 
-        currentUrl = currentUrl.replace("https://", "");
-        currentUrl = currentUrl.replace("http://", "");
-        currentUrl = currentUrl.replace(/\/+$/, "");
- 
-        let urlParts = currentUrl.split('/');
- 
-        let domain = urlParts[0];
- 
-        urlParts.shift();
- 
-        let path = urlParts.join("/");
- 
-        let modifiedUrl = "https://" + domain + "/backend";
- 
-        if(path != "") { modifiedUrl += "#/editor/" + path; }
-
-        chrome.tabs.create({url: modifiedUrl});
-        
-    });
-});
+}));
