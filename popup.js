@@ -1,6 +1,11 @@
 
-const getProfileSlug = () => {
-    return document.querySelector("meta[name='cybernautic-editor-backend-uri']").getAttribute('content');
+const getBackendURI = () => {
+
+    var meta = document.querySelectorAll("meta[name='cybernautic-editor-backend-uri']")
+        meta = meta[meta.length - 1];
+        
+    return meta.getAttribute('content');
+
 }
 
 document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventListener("click", () => {
@@ -25,7 +30,7 @@ document.querySelectorAll('[data-go-to-backend]').forEach(elem => elem.addEventL
 
         chrome.scripting.executeScript({
             target: { tabId: tabs[0].id },
-            func: getProfileSlug
+            func: getBackendURI
         }, (result) => {
 
             if(result[0].result != null) {
